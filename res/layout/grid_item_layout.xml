@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+   android:id="@+id/GridItem"
+   android:layout_width="match_parent"
+   android:layout_height="100dp"
+   android:orientation="vertical"
+   android:gravity="center_horizontal"
+   android:background="#ffffff">
+   
+   <ImageView android:id="@+id/grid_item_image"
+      android:layout_width="fill_parent"
+      android:layout_height="fill_parent"
+      android:contentDescription="@string/btn_recipes">
+   </ImageView>
+  
+   <TextView android:id="@+id/grid_item_text"
+      android:layout_width="fill_parent"
+      android:layout_height="20dp"
+      android:text="TextView"
+      android:gravity="bottom"
+      android:textSize="15sp"
+      android:singleLine="true"
+      android:textColor="@color/lightest_gray"
+      android:background="@drawable/trans_bg"
+      android:layout_alignTop="@+id/grid_item_image">
+   </TextView>
+ 
+   
+</RelativeLayout>

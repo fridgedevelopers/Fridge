@@ -1,0 +1,54 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".RecipeCategories"
+    android:background="@drawable/dark_background">
+
+	<ListView
+	    android:id="@android:id/list"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:layout_marginTop="60dp"
+	    android:layout_alignParentLeft="true" >
+	</ListView>
+
+	<RelativeLayout
+	    android:padding="5dp"
+	    android:id="@+id/search_recipe_category"
+	    android:layout_width="wrap_content"
+	    android:layout_height="75dp"
+	    android:layout_alignParentLeft="true"
+	    android:layout_alignParentTop="true"
+	    android:background="@drawable/tab">
+
+
+	    <Button
+	        android:id="@+id/search_recipeCategory"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_alignParentLeft="true"
+	        android:layout_alignParentTop="true"
+	        android:layout_marginTop="5dp"
+	        android:background="@drawable/recipes_state"
+	        android:height="50dp"
+	        android:width="50dp" />
+	    
+	   <EditText
+	        android:id="@+id/recipe_category_search"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:maxHeight="45dp"
+	        android:layout_toRightOf="@+id/search_recipeCategory"
+	        android:layout_alignBaseline="@+id/search_recipeCategory"
+	        android:layout_alignBottom="@+id/search_recipeCategory"
+	        android:layout_alignParentRight="true"
+	        android:layout_marginTop="5dp"
+	        android:paddingRight="45dp"
+	        android:singleLine="true"
+	        android:ems="10"
+	        android:hint="@string/search_recipe_category" >
+	    </EditText>
+	    
+	</RelativeLayout>
+</RelativeLayout>

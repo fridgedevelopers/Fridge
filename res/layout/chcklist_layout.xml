@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="50dp"
+    android:orientation="vertical" 
+    android:paddingLeft="10dp"
+    android:background="@drawable/fridge_list_state_even">
+    
+	 <CheckBox
+        android:id="@+id/checkBox1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:focusable="false"
+        android:layout_centerVertical="true"
+        android:focusableInTouchMode="false"
+        android:button="@drawable/custom_checkbox" />
+	
+    <TextView
+        android:id="@+id/label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@+id/label"
+        android:textSize="23sp"
+        android:singleLine="true"
+        android:textColor="@color/green"
+        android:layout_centerVertical="true"
+        android:layout_toRightOf="@+id/checkBox1">
+    </TextView>
+    
+</RelativeLayout>

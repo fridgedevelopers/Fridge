@@ -1,0 +1,83 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical"
+    tools:context=".Main"
+    android:background="@drawable/main_background" >
+
+    <LinearLayout
+        android:id="@+id/main_wrapper"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:gravity="center" >
+
+        <ImageView
+            android:id="@+id/logo"
+            android:layout_width="180dp"
+            android:layout_height="150dp"
+            android:contentDescription="@string/fridge_logo"
+            android:src="@drawable/fridge_logo" />
+    </LinearLayout>
+   	
+   	<LinearLayout 
+   	    android:id="@+id/menu_buttons"
+   	    android:layout_width="match_parent"
+   	    android:layout_height="60dp">
+   	    
+   	    <Button
+   	        android:paddingTop="8dp"
+   	        android:id="@+id/btn_pantry"
+   	        android:layout_width="0dp"
+   	        android:layout_height="match_parent"
+   	        android:layout_weight="1"
+   	        android:background="@drawable/menu_button_bg"
+   	        android:text="@string/btn_pantry"
+   	        android:textColor="@color/lightest_gray"
+   	        android:textSize="8sp"
+   	        android:drawableTop="@drawable/pantry_state"
+   	        android:onClick="pantryClick"/>
+   	    
+   	    <Button 
+   	        android:paddingTop="8dp"
+   	        android:id="@+id/btn_recipes"
+   	        android:text="@string/btn_recipes"
+   	        android:layout_weight="1"
+   	        android:layout_width="0dp"
+   			android:layout_height="match_parent"
+   	        android:background="@drawable/menu_button_bg"
+   			android:textSize="8sp"
+   			android:textColor="@color/lightest_gray"
+   	        android:drawableTop="@drawable/recipes_state"
+   	        android:onClick="recipesClick" />
+   	    
+   	    <Button 
+   	        android:paddingTop="8dp"
+   	        android:id="@+id/btn_suggestions"
+   	        android:text="@string/btn_suggestions"
+   	        android:layout_weight="1"
+   	        android:layout_width="0dp"
+   			android:layout_height="match_parent"
+   	        android:background="@drawable/menu_button_bg"
+   			android:textSize="8sp"
+   			android:textColor="@color/lightest_gray"
+   			android:drawableTop="@drawable/suggestions"
+   	        android:onClick="suggestionsClick"/>
+   	    
+   	    <Button 
+   	        android:paddingTop="8dp"
+   	        android:id="@+id/btn_favorites"
+   	        android:text="@string/btn_favorites"
+   	        android:layout_weight="1"
+   	        android:layout_width="0dp"
+   			android:layout_height="match_parent"
+   	        android:background="@drawable/menu_button_bg"
+   			android:textSize="8sp"
+   			android:textColor="@color/lightest_gray"
+   			android:drawableTop="@drawable/favorites"
+   	        android:onClick="favoritesClick"  />
+   	    
+   	</LinearLayout> 
+
+</LinearLayout>

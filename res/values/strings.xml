@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Fridge</string>
+    <string name="menu_settings">Settings</string>
+    <string name="fridge_logo">Fridge Logo</string>
+    <string name="btn_pantry">Pantry</string>
+    <string name="btn_recipes">Recipes</string>
+    <string name="btn_suggestions">Suggestions</string>
+    <string name="btn_favorites">Favorites</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="title_activity_recipes">Recipes</string>
+    <string name="title_activity_recipe_categories">RecipeCategories</string>
+    <string name="title_activity_pantry_categories">PantryCategories</string>
+    <string name="title_activity_pantry">Pantry</string>
+    <string name="search_recipe_category">Search Category&#8230;</string>
+    <string name="search_recipe">Search Recipe&#8230;</string>
+    <string name="search">Search</string>
+    <string name="btn_search">Search Btn</string>
+    <string name="tab_ingredients">INGREDIENTS</string>
+    <string name="tab_steps">STEPS</string>
+    
+	<string-array name="pantry_categories">
+        <item>Vegetables</item>
+        <item>Fruits</item>
+        <item>Pork</item>
+        <item>Beef</item>
+        <item>Spices</item>
+        <item>Seasoning</item>
+        <item>Liquids</item>
+        <item>Others</item>
+    </string-array>
+    
+	<string-array name="recipe_categories">
+        <item>Appetizer</item>
+        <item>Main Dish</item>
+        <item>Entree</item>
+        <item>Salads</item>
+        <item>Desserts</item>
+        <item>Side Dish</item>
+        <item>Soup</item>
+        <item>Oriental</item>
+    </string-array>
+    
+</resources>
