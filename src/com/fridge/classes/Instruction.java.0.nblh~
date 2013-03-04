@@ -1,0 +1,18 @@
+package fridge.classes;
+
+public class Instruction
+{
+    private long id;
+    private String instruction;
+    
+    public Intruction(long id, String instruction)
+    {
+        
+    }
+    
+    @Override
+    public String toString()
+    {
+        return instruction;
+    }
+}

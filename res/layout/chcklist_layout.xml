@@ -14,7 +14,7 @@
         android:focusable="false"
         android:layout_centerVertical="true"
         android:focusableInTouchMode="false"
-        android:button="@drawable/custom_checkbox" />
+        android:button="@drawable/custom_checkbox_state" />
 	
     <TextView
         android:id="@+id/label"

@@ -15,10 +15,13 @@
     <string name="title_activity_pantry">Pantry</string>
     <string name="search_recipe_category">Search Category&#8230;</string>
     <string name="search_recipe">Search Recipe&#8230;</string>
+    <string name="search_favorite_recipe">Search Favorite Recipe&#8230;</string>
     <string name="search">Search</string>
     <string name="btn_search">Search Btn</string>
     <string name="tab_ingredients">INGREDIENTS</string>
     <string name="tab_steps">STEPS</string>
+    <string name="recommended_recipes">Recommended Recipes</string>
+    <string name="btn_recommend">Get recommendations</string>
     
 	<string-array name="pantry_categories">
         <item>Vegetables</item>

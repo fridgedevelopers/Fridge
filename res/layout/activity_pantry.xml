@@ -1,79 +1,113 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/parentLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/dark_background" >
 
-    <ListView
-	  android:id="@android:id/list"
-	  android:layout_width="wrap_content"
-	  android:layout_height="wrap_content" 
-	  android:layout_marginLeft="5dp"
-	  android:layout_marginRight="5dp"
-	  android:layout_marginBottom="5dp"
-	  android:layout_marginTop="130dp" >
-	</ListView>
-    
-   <LinearLayout
-       android:id="@+id/sub_menu_layout"
-       android:layout_width="wrap_content"
-       android:layout_height="60dp"
-       android:layout_marginTop="64dp"
-       android:padding="10dp"
-       android:background="@drawable/sub_header" >
-	    
-	  <Spinner
-	      android:id="@+id/spinner_pantry_categories"
-	      android:layout_width="0dp"
-	      android:layout_height="50dp"
-	      android:layout_weight="13"
-	      android:layout_gravity="center_vertical"
-	      android:background="@drawable/spinner_state_2" />
-	  
-	  <Button
-	      android:id="@+id/btn_add_ingredient"
-	      android:layout_width="42dp"
-	      android:layout_height="wrap_content"
-	      android:layout_gravity="center_vertical"
-	      android:layout_weight="0.19"
-	      android:background="@drawable/add_state"
-	      android:height="50dp"
-	      android:onClick="addIngredient"
-	      android:width="50dp" />
-	  
-   </LinearLayout>
-    
-   <RelativeLayout
-	    android:padding="5dp"
-	    android:id="@+id/search_recipe_category"
-	    android:layout_width="wrap_content"
-	    android:layout_height="75dp"
-	    android:background="@drawable/main_header" >
 
-	    <TextView
-            android:id="@+id/recipe_category_search"
+    <RelativeLayout
+        android:id="@+id/wrap_layout"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content" >
+
+        <ListView
+            android:id="@android:id/list"
             android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_marginLeft="10dp"
-            android:layout_toRightOf="@+id/search_recipeCategory"
-            android:ellipsize="marquee"
-            android:gravity="fill_vertical"
-            android:text="Pantry"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="5dp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:layout_marginTop="130dp" >
+        </ListView>
+
+        <LinearLayout
+            android:id="@+id/sub_menu_layout"
+            android:layout_width="fill_parent"
+            android:layout_height="60dp"
+            android:layout_marginTop="64dp"
+            android:background="@drawable/sub_header"
+            android:padding="10dp" >
+
+            <Spinner
+                android:id="@+id/spinner_pantry_categories"
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_gravity="center_vertical"
+                android:layout_weight="13"
+                android:background="@drawable/spinner_state" />
+
+            <Button
+                android:id="@+id/btn_add_ingredient"
+                android:layout_width="42dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_weight="0.19"
+                android:background="@drawable/add_state"
+                android:height="50dp"
+                android:onClick="addIngredient"
+                android:width="50dp" />
+        </LinearLayout>
+
+        <RelativeLayout
+            android:id="@+id/search_recipe_category"
+            android:layout_width="fill_parent"
+            android:layout_height="75dp"
+            android:background="@drawable/main_header" >
+
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:layout_toRightOf="@+id/search_recipeCategory_layout" >
+
+                <TextView
+                    android:id="@+id/recipe_category_search"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:ellipsize="marquee"
+                    android:gravity="fill_vertical"
+                    android:text="Pantry"
+                    android:textColor="@color/lightest_gray"
+                    android:textSize="20sp" />
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/search_recipeCategory_layout"
+                android:layout_width="70dp"
+                android:layout_height="fill_parent"
+                android:layout_alignParentLeft="true"
+                android:layout_marginLeft="4dp"
+                android:background="@drawable/main_header_green"
+                android:gravity="center"
+                android:padding="5dp" >
+
+                <Button
+                    android:id="@+id/search_recipeCategory"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignTop="@+id/recipe_category_search"
+                    android:background="@drawable/pantry_state"
+                    android:height="40dp"
+                    android:width="40dp" />
+            </RelativeLayout>
+        </RelativeLayout>
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/recommend_btn_layout"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginTop="10dp">
+
+        <Button
+            android:id="@+id/btn_recommend"
+            android:layout_width="fill_parent"
+            android:layout_height="60dp"
+            android:background="@drawable/buttn"
             android:textColor="@color/lightest_gray"
-            android:textSize="20sp" />
-	    
-	    <Button
-	        android:id="@+id/search_recipeCategory"
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:layout_alignParentLeft="true"
-	        android:layout_alignTop="@+id/recipe_category_search"
-	        android:layout_marginLeft="4dp"
-	        android:background="@drawable/pantry_state"
-	        android:height="50dp"
-	        android:width="50dp" />
-
-	</RelativeLayout>
-
- 
+            android:textStyle="bold"
+            android:text="@string/btn_recommend" />
+    </RelativeLayout>
 </RelativeLayout>
