@@ -84,7 +84,7 @@ public class ImageAdapter extends BaseAdapter {
 
 	@Override
 	public int getCount() {
-		return recipe_images_path.length;
+		return recipe_names.length;
 	}
 
 	@Override

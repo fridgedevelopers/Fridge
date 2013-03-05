@@ -187,6 +187,7 @@ public class FridgeDao {
 		for(mCursor.moveToFirst(); !mCursor.isAfterLast(); mCursor.moveToNext()) {
 		    mArrayList.add(mCursor.getString(1));
 		}
+		mCursor.close();
 		db.close();
 		return mArrayList.toArray(new String[mArrayList.size()]);
 	}
@@ -226,6 +227,8 @@ public class FridgeDao {
 			for(resultset.moveToFirst(); !resultset.isAfterLast(); resultset.moveToNext()) {
 		    mArrayList.add(resultset.getString(2));
 		}
+			resultset.close();
+			category_id.close();
 		db.close();
 		return mArrayList.toArray(new String[mArrayList.size()]);
 	}
@@ -249,9 +252,11 @@ public class FridgeDao {
 			Cursor imagepath = db.rawQuery("SELECT * FROM "+ RecipeImages.TABLE_NAME + " WHERE "+ RecipeImages.COLUMN_RECIPE_ID + "=" + resultset.getInt(0), null);
 			for(imagepath.moveToFirst(); !imagepath.isAfterLast(); imagepath.moveToNext()) {
 			    mArrayList.add(imagepath.getString(2));
+				imagepath.close();
 			}
 		}
-		
+		resultset.close();
+		category_id.close();
 		db.close();
 		return mArrayList.toArray(new String[mArrayList.size()]);
 	}
