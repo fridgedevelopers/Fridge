@@ -1,89 +1,103 @@
+
 package com.fridge.activity;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.nio.channels.FileChannel;
+import java.io.IOException;
 
-import com.fridge.database.FridgeDao;
-import com.fridge.R;
-import android.os.Bundle;
-import android.os.Environment;
-import android.os.Handler;
 import android.content.Intent;
+import android.database.SQLException;
 import android.graphics.PixelFormat;
+import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 
+import com.fridge.R;
+import com.fridge.database.FridgeHelper;
+import com.fridge.util.ApplicationController;
+
 public class Main extends FragmentActivity
 {
-	FridgeDao db = new FridgeDao(this);
-	@Override
-	protected void onCreate(Bundle savedInstanceState)
-	{
-		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_main);
-		db.InsertRecipeCategories();
-		db.InsertRecipe();
-//		db.InsertRecipeImages();
-//		db.Update();
-		
-//		try {
-//            File sd = Environment.getExternalStorageDirectory();
-//            File data = Environment.getDataDirectory();
-//
-//            if (sd.canWrite()) {
-//                String currentDBPath = "//data//com.fridge//databases//fridge.db";
-//                String backupDBPath = "fridge.db";
-//                File currentDB = new File(data, currentDBPath);
-//                File backupDB = new File(sd, backupDBPath);
-//
-//                if (currentDB.exists()) {
-//                    FileChannel src = new FileInputStream(currentDB).getChannel();
-//                    FileChannel dst = new FileOutputStream(backupDB).getChannel();
-//                    dst.transferFrom(src, 0, src.size());
-//                    src.close();
-//                    dst.close();
-//                }
-//            }
-//        } catch (Exception e) {
-//
-//        }
-	}
+    @Override
+    protected void onCreate(Bundle savedInstanceState)
+    {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        FridgeHelper myDbHelper = new FridgeHelper(this);
 
-	
-	@Override
-	public void onAttachedToWindow()
-	{
-		super.onAttachedToWindow();
-		Window window = getWindow();
-		window.setFormat(PixelFormat.RGBA_8888);
-	}
-	
-	public void recipesClick(View view)
-	{
-		Intent intent = new Intent(this, Recipes.class);
-		startActivity(intent);
-	}
-	
-	public void pantryClick(View view)
-	{
-		Intent intent = new Intent(this, Pantry.class);
-		startActivity(intent);
-	}
-	
-	public void suggestionsClick(View view)
-	{
-		Intent intent = new Intent(this, Suggestions.class);
-		startActivity(intent);
-	}
-	
-	public void favoritesClick(View view)
-	{
-		Intent intent = new Intent(this, Favorites.class);
-		startActivity(intent);
-	}
+        try
+        {
+            myDbHelper.createDataBase();
+            myDbHelper.openDataBase();
+        }
+        catch(IOException e)
+        {
+            e.printStackTrace();
+        }
+        catch(SQLException e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void onAttachedToWindow()
+    {
+        super.onAttachedToWindow();
+        Window window = getWindow();
+        window.setFormat(PixelFormat.RGBA_8888);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
+        Intent intent = null;
+        
+        switch(item.getItemId())
+        {
+            case R.id.menu_settings :
+                intent = new Intent(this, Settings.class);
+                break;
+            case R.id.developers :
+                intent = new Intent(this, Developers.class);
+                break;
+        }
+
+        startActivity(intent);
+        return true;
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu)
+    {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.activity_main, menu);
+        return true;
+    }
+    
+    public void click(View view)
+    {
+        Intent intent = null;
+        
+        switch(view.getId())
+        {
+            case R.id.btn_pantry:
+                intent = new Intent(this, Pantry.class);
+                break;
+            case R.id.btn_recipes:
+                intent = new Intent(this, Recipes.class);
+                break;
+            case R.id.btn_suggestions:
+                intent = new Intent(this, Suggestions.class);
+                intent.putExtra(ApplicationController.GET_RECOMMENDATION_TYPE, "System Recommendation");
+                break;
+            case R.id.btn_favorites:
+                intent = new Intent(this, Favorites.class);
+                break;
+        }
+        
+        startActivity(intent);
+    }
 }

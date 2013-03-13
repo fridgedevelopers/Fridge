@@ -1,10 +1,18 @@
 package com.fridge.classes;
 
-public class RecipeIngredient extends Ingredient
+import java.io.Serializable;
+
+public class RecipeIngredient extends Ingredient 
 {
     private double quantity;
     private String unit;
     private String note;
+    
+    public RecipeIngredient(long id,
+            String name)
+    {
+    	super(id, name);
+    }
     
     public RecipeIngredient(long id, String name, double quantity, String unit, String note)
     {

@@ -2,17 +2,26 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.fridge"
     android:versionCode="1"
-    android:versionName="1.0">
+    android:versionName="2.0"
+    android:installLocation="preferExternal" >
 
     <uses-sdk
         android:minSdkVersion="8"
         android:targetSdkVersion="17" />
 
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+
     <application
+        android:name="com.fridge.util.ApplicationController"
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:theme="@android:style/Theme.Light.NoTitleBar" >
+        <service android:name="com.fridge.util.FridgeService" >
+        </service>
+
         <activity
             android:name="com.fridge.activity.Main"
             android:label="@string/app_name" >
@@ -22,25 +31,16 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        
         <activity
             android:name="com.fridge.activity.Recipes"
+            android:configChanges="orientation|keyboardHidden|locale|layoutDirection"
             android:label="@string/title_activity_recipe_categories"
-            android:parentActivityName="com.fridge.Main" >
+            android:parentActivityName="com.fridge.Main"
+            android:windowSoftInputMode="stateHidden" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.fridge.Main" />
         </activity>
-        
-        <activity
-            android:name="com.fridge.activity.PantryCategories"
-            android:label="@string/title_activity_pantry_categories"
-            android:parentActivityName="com.fridge.Main" >
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.fridge.Main" />
-        </activity>
-        
         <activity
             android:name="com.fridge.activity.Pantry"
             android:label="@string/title_activity_pantry"
@@ -49,7 +49,6 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.fridge.Main" />
         </activity>
-        
         <activity
             android:name="com.fridge.activity.SingleRecipe"
             android:label="@string/title_activity_pantry"
@@ -58,25 +57,47 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.fridge.Main" />
         </activity>
-        
         <activity
             android:name="com.fridge.activity.Suggestions"
+            android:configChanges="orientation|keyboardHidden|locale|layoutDirection"
             android:label="@string/title_activity_pantry"
             android:parentActivityName="com.fridge.Main" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.fridge.Main" />
         </activity>
-        
         <activity
             android:name="com.fridge.activity.Favorites"
+            android:configChanges="orientation|keyboardHidden|locale|layoutDirection"
             android:label="@string/title_activity_pantry"
+            android:parentActivityName="com.fridge.Main"
+            android:windowSoftInputMode="stateHidden" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.fridge.Main" />
+        </activity>
+        <activity
+            android:name="com.fridge.activity.Settings"
+            android:label="@string/title_activity_settings"
             android:parentActivityName="com.fridge.Main" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.fridge.Main" />
         </activity>
-        
+        <activity
+            android:name="com.fridge.activity.UserSettingActivity"
+            android:parentActivityName="com.fridge.Main" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.fridge.Main" />
+        </activity>
+        <activity
+            android:name="com.fridge.activity.Developers"
+            android:parentActivityName="com.fridge.Main" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.fridge.Main" />
+        </activity>
     </application>
 
 </manifest>

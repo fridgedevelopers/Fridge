@@ -1,318 +1,557 @@
+
 package com.fridge.database;
 
 import java.util.ArrayList;
-import java.util.List;
-
-import com.fridge.database.DatabaseClasses.*;
-import com.fridge.database.FridgeContract.Favorites;
-import com.fridge.database.FridgeContract.Instructions;
-import com.fridge.database.FridgeContract.PantryCategories;
-import com.fridge.database.FridgeContract.PantryIngredients;
-import com.fridge.database.FridgeContract.RecipeCategories;
-import com.fridge.database.FridgeContract.RecipeImages;
-import com.fridge.database.FridgeContract.RecipeIngredients;
-import com.fridge.database.FridgeContract.RecipeTags;
-import com.fridge.database.FridgeContract.Recipes;
-import com.fridge.database.FridgeContract.Settings;
 
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import com.fridge.classes.Category;
+import com.fridge.classes.Ingredient;
+import com.fridge.classes.Instruction;
+import com.fridge.classes.Recipe;
+import com.fridge.classes.RecipeIngredient;
+import com.fridge.classes.Tag;
+import com.fridge.database.FridgeContract.Favorites;
+import com.fridge.database.FridgeContract.Instructions;
+import com.fridge.database.FridgeContract.PantryCategories;
+import com.fridge.database.FridgeContract.PantryIngredients;
+import com.fridge.database.FridgeContract.RecipeCategories;
+import com.fridge.database.FridgeContract.RecipeIngredients;
+import com.fridge.database.FridgeContract.RecipeTags;
+import com.fridge.database.FridgeContract.Recipes;
+import com.fridge.util.IngredientsListAdapter;
 
-public class FridgeDao {
-	private final Context context;
-	private SQLiteDatabase db;
-	private FridgeHelper helper;
-	
-	public FridgeDao(Context ctx){
-		this.context = ctx;
-		helper = new FridgeHelper(context);
-	}
-	
-	// OPERATIONS //
-	
-	public FridgeDao open() throws SQLException
-	{
-		db = helper.getWritableDatabase();
-		return this;
-	}
-	
-	public void InsertPantryCategories(String name)
-	{
-		this.open();
-		ContentValues values = new ContentValues();
-		values.put(PantryCategories.COLUMN_NAME, name);
-		values.put(PantryCategories.COLUMN_DESCRIPTION,"Ingredients that does not belong to any categories mentioned.");
-		db.insert(PantryCategories.TABLE_NAME, null, values);
-		db.close();
-	}
-	
-	public void InsertRecipeCategories()
-	{
-		this.open();
-		ContentValues values = new ContentValues();
-		String[] names= {"","FingerFood","Seafood","Soup","Main Dish"};
-		for(int i=1;i<=4;i++)
-		{
-			values.put(RecipeCategories.COLUMN_NAME, names[i]);
-			values.put(RecipeCategories.COLUMN_DESCRIPTION,"A dish that can be best eaten using the fingers.");
-			db.insert(RecipeCategories.TABLE_NAME, null, values);
-		}
-		
-		db.close();
-	}
-	
-	public void InsertPantryIngredients(String value, String category)
-	{
-		this.open();
-//		db.execSQL(PantryIngredients.DROP_TABLE);
-//		db.execSQL(PantryIngredients.CREATE_TABLE);
-		Cursor category_id = db.rawQuery("SELECT * FROM " + PantryCategories.TABLE_NAME + " WHERE "+ PantryCategories.COLUMN_NAME + "=" + "'"+ category + "'", null);
-		category_id.moveToFirst();
-		ContentValues values = new ContentValues();
-		values.put(PantryIngredients.COLUMN_NAME,value);
-		values.put(PantryIngredients.COLUMN_PANTRY_CATEGORY_ID, category_id.getInt(0));
-		db.insert(PantryIngredients.TABLE_NAME, null, values);
-		db.close();
-	}
-	
-	public void InsertRecipe()
-	{
-		this.open();
-		ContentValues values = new ContentValues();
-//		db.execSQL(PantryIngredients.DROP_TABLE);
-//		db.execSQL(PantryIngredients.CREATE_TABLE);
-		for(int i=1; i<=4;i++)
-		{
-			values.put(Recipes.COLUMN_NAME,"FingerFood"+i);
-			values.put(Recipes.COLUMN_RECIPE_CATEGORY_ID,1);
-			values.put(Recipes.COLUMN_DESCRIPTION,"FingerFoodD"+i);
-			values.put(Recipes.COLUMN_DURATION,1);
-			values.put(Recipes.COLUMN_SERVING_SIZE,2);
-			values.put(Recipes.COLUMN_VIEWS,3);
-			values.put(Recipes.COLUMN_RATINGS,4);
-			values.put(Recipes.COLUMN_OVERALL_RATING,5);
-			
-			db.insert(Recipes.TABLE_NAME, null, values);
-		}
-		
-		
-		db.close();
-	}
-	
-	public void InsertRecipeImages()
-	{
-		this.open();
-//		db.execSQL(PantryIngredients.DROP_TABLE);
-//		db.execSQL(PantryIngredients.CREATE_TABLE);
-		ContentValues values = new ContentValues();
-		for(int i=5; i<=8;i++)
-		{
-		values.put(RecipeImages.COLUMN_RECIPE_ID,i);
-		values.put(RecipeImages.COLUMN_PATH,"images/S"+i+".jpg");
+public class FridgeDAO
+{
+    private FridgeHelper dbHelper;
 
-		db.insert(RecipeImages.TABLE_NAME, null, values);
-		}
-		db.close();
-	}
-	
-	
-	public void InsertFavorites(int id)
-	{
-		this.open();
-		ContentValues values = new ContentValues();
-		values.put(Favorites.COLUMN_RECIPE_ID, id);
-		db.insert(Favorites.TABLE_NAME, null, values);
-		db.close();
-	}
-	
-	public void DeleteFavorites(int id)
-	{
-		this.open();
-		ContentValues values = new ContentValues();
-		values.put(Favorites.COLUMN_RECIPE_ID, id);
-		db.delete(Favorites.TABLE_NAME, Favorites.COLUMN_RECIPE_ID+"="+id, null);
-		db.close();
-	}
-	
-	public Boolean CheckFavorites(int id)
-	{
-		this.open();
-		Boolean ret = false;
-		Cursor mCursor = db.rawQuery("SELECT * FROM "+ Favorites.TABLE_NAME+" WHERE "+ Favorites.COLUMN_RECIPE_ID+"="+id, null);
-		mCursor.moveToFirst(); 
-		
-		if(mCursor.getCount()!=0)
-			ret=true;
-		db.close();
-		return ret;
-	}
-	
-	public String[] RetrieveRecipeDescription(String recipe_name)
-	{
-		this.open();
-		
-		Cursor mCursor = db.rawQuery("SELECT "+ Recipes.COLUMN_DESCRIPTION +","+ Recipes.COLUMN_RECIPE_ID + " FROM "+ Recipes.TABLE_NAME + " WHERE "+ Recipes.COLUMN_NAME + "='" + recipe_name+"'", null);
-		mCursor.moveToFirst(); 
-		String ret[] = {mCursor.getString(0),mCursor.getString(1)};
-		db.close();
-		return ret;
-	}
-	
-	public String[] RetrievePantryCategories()
-	{
-		this.open();
-		ArrayList<String> mArrayList = new ArrayList<String>();
-		Cursor mCursor = db.rawQuery("SELECT * FROM "+ PantryCategories.TABLE_NAME, null);
-		
-		for(mCursor.moveToFirst(); !mCursor.isAfterLast(); mCursor.moveToNext()) {
-		    mArrayList.add(mCursor.getString(1));
-		}
-		
-		db.close();
-		return mArrayList.toArray(new String[mArrayList.size()]);
-	}
-	
-	public String[] RetrieveRecipeCategories()
-	{
-		this.open();
-		ArrayList<String> mArrayList = new ArrayList<String>();
-		Cursor mCursor = db.rawQuery("SELECT * FROM "+ RecipeCategories.TABLE_NAME, null);
-		
-		for(mCursor.moveToFirst(); !mCursor.isAfterLast(); mCursor.moveToNext()) {
-		    mArrayList.add(mCursor.getString(1));
-		}
-		mCursor.close();
-		db.close();
-		return mArrayList.toArray(new String[mArrayList.size()]);
-	}
-	
+    private SQLiteDatabase database;
 
-	public String[] RetrievePantryIngredients(String category)
-	{
-		this.open();
-		Cursor category_id = db.rawQuery("SELECT * FROM " + PantryCategories.TABLE_NAME + " WHERE "+ PantryCategories.COLUMN_NAME + "=" + "'"+ category + "'", null);
-		category_id.moveToFirst();
-		
-		ArrayList<String> mArrayList = new ArrayList<String>();
-		Cursor resultset = db.rawQuery("SELECT * FROM " + PantryIngredients.TABLE_NAME + " WHERE "+ PantryIngredients.COLUMN_PANTRY_CATEGORY_ID + "=" + category_id.getInt(0), null);
-	
-		for(resultset.moveToFirst(); !resultset.isAfterLast(); resultset.moveToNext()) {
-		    mArrayList.add(resultset.getString(3));
-		}
-		db.close();
-		return mArrayList.toArray(new String[mArrayList.size()]);
-	}
-	
-	public String[] RetrieveRecipeNames(String category, String search)
-	{
-		this.open();
-		Cursor category_id = db.rawQuery("SELECT * FROM " + RecipeCategories.TABLE_NAME + " WHERE "+ RecipeCategories.COLUMN_NAME + " LIKE " + "'%"+ category + "%'", null);
-		
-		category_id.moveToFirst();
-		
-		ArrayList<String> mArrayList = new ArrayList<String>();
-		Cursor resultset;
-		if(search==null){
-			 resultset = db.rawQuery("SELECT * FROM " + Recipes.TABLE_NAME + " WHERE "+ Recipes.COLUMN_RECIPE_CATEGORY_ID + "=" + category_id.getInt(0), null);
-		}
-		else{
-			 resultset = db.rawQuery("SELECT * FROM " + Recipes.TABLE_NAME + " WHERE "+ Recipes.COLUMN_RECIPE_CATEGORY_ID + "=" + category_id.getInt(0) + " AND " + Recipes.COLUMN_NAME + " LIKE " + "'%"+ search + "%'", null);
-		}
-			for(resultset.moveToFirst(); !resultset.isAfterLast(); resultset.moveToNext()) {
-		    mArrayList.add(resultset.getString(2));
-		}
-			resultset.close();
-			category_id.close();
-		db.close();
-		return mArrayList.toArray(new String[mArrayList.size()]);
-	}
-	
-	public String[] RetrieveRecipeImages(String category,String search)
-	{
-		this.open();
-		Cursor category_id = db.rawQuery("SELECT * FROM " + RecipeCategories.TABLE_NAME + " WHERE "+ RecipeCategories.COLUMN_NAME + " LIKE " + "'%"+ category + "%'", null);
-		category_id.moveToFirst();
-		
-		ArrayList<String> mArrayList = new ArrayList<String>();
-		Cursor resultset;
-		
-		if(search==null){
-			resultset = db.rawQuery("SELECT * FROM " + Recipes.TABLE_NAME + " WHERE "+ Recipes.COLUMN_RECIPE_CATEGORY_ID + "=" + category_id.getInt(0), null);
-		}
-		else{
-			 resultset = db.rawQuery("SELECT * FROM " + Recipes.TABLE_NAME + " WHERE "+ Recipes.COLUMN_RECIPE_CATEGORY_ID + "=" + category_id.getInt(0) + " AND " + Recipes.COLUMN_NAME + " LIKE " + "'%"+ search + "%'", null);
-		}
-		for(resultset.moveToFirst(); !resultset.isAfterLast(); resultset.moveToNext()) {
-			Cursor imagepath = db.rawQuery("SELECT * FROM "+ RecipeImages.TABLE_NAME + " WHERE "+ RecipeImages.COLUMN_RECIPE_ID + "=" + resultset.getInt(0), null);
-			for(imagepath.moveToFirst(); !imagepath.isAfterLast(); imagepath.moveToNext()) {
-			    mArrayList.add(imagepath.getString(2));
-				imagepath.close();
-			}
-		}
-		resultset.close();
-		category_id.close();
-		db.close();
-		return mArrayList.toArray(new String[mArrayList.size()]);
-	}
-	
-	public void Update(){
-		this.open();
-		
-		for(int i=5, j=1; i<=8; i++,j++)
-		{
-			ContentValues args = new ContentValues();
-			args.put(RecipeImages.COLUMN_PATH, "images/S"+j+".jpg");
-			db.update(RecipeImages.TABLE_NAME, args, RecipeImages.COLUMN_RECIPE_IMAGES_ID + "=" + i, null);
-		}
-		
-	}	
-	
-	// START OF FRIDGE HELPER // 
-	public class FridgeHelper extends SQLiteOpenHelper
-	{
-		public static final int DATABASE_VERSION = 7;
-		public static final String DATABASE_NAME = "fridge.db";
-		
-		public FridgeHelper(Context context)
-		{
-			super(context, DATABASE_NAME, null, DATABASE_VERSION);
-		}
+    public FridgeDAO(Context context)
+    {
+        dbHelper = new FridgeHelper(context);
+    }
 
-		@Override
-		public void onCreate(SQLiteDatabase db)
-		{
-			db.execSQL(RecipeCategories.CREATE_TABLE);
-			db.execSQL(PantryCategories.CREATE_TABLE);
-			db.execSQL(Recipes.CREATE_TABLE);
-			db.execSQL(Favorites.CREATE_TABLE);
-			db.execSQL(RecipeImages.CREATE_TABLE);
-			db.execSQL(RecipeTags.CREATE_TABLE);
-			db.execSQL(Settings.CREATE_TABLE);
-			db.execSQL(PantryIngredients.CREATE_TABLE);
-			db.execSQL(RecipeIngredients.CREATE_TABLE);
-			db.execSQL(Instructions.CREATE_TABLE);
-		
-		}
+    public FridgeDAO open() throws SQLException
+    {
+        database = dbHelper.openDataBase();
+        return this;
+    }
 
-		@Override
-		public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion)
-		{
-			db.execSQL(RecipeCategories.DROP_TABLE);
-			db.execSQL(Recipes.DROP_TABLE);
-			db.execSQL(Favorites.DROP_TABLE);
-			db.execSQL(RecipeImages.DROP_TABLE);
-			db.execSQL(RecipeTags.DROP_TABLE);
-			db.execSQL(Settings.DROP_TABLE);
-			db.execSQL(PantryIngredients.DROP_TABLE);
-			db.execSQL(RecipeIngredients.DROP_TABLE);
-			db.execSQL(Instructions.DROP_TABLE);
-			onCreate(db);
-		}	
-	} //end of FRIDGE HELPER
+    public void close()
+    {
+        dbHelper.close();
+    }
+
+    public ArrayList<Tag> fetchTags(int id)
+    {
+        open();
+        ArrayList<Tag> tags = new ArrayList<Tag>();
+        String sql = "SELECT " + RecipeTags.COLUMN_RECIPE_ID + " FROM " + RecipeTags.TABLE_NAME + " WHERE "
+                + RecipeTags.COLUMN_RECIPE_ID + " = " + id;
+        Cursor cursor = database.rawQuery(sql, null);
+
+        for(cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext())
+        {
+            Tag tag = new Tag(cursor.getInt(cursor.getColumnIndex("_id")), cursor.getString(cursor
+                    .getColumnIndex("tag")));
+            tags.add(tag);
+        }
+
+        cursor.close();
+        close();
+        return tags;
+    }
+
+    public ArrayList<Instruction> fetchInstructions(int id)
+    {
+        open();
+        ArrayList<Instruction> instructions = new ArrayList<Instruction>();
+        String sql = "SELECT * FROM " + Instructions.TABLE_NAME + " WHERE "
+                + Instructions.COLUMN_RECIPE_ID + " = " + id;
+        Cursor cursor = database.rawQuery(sql, null);
+
+        for(cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext())
+        {
+            Instruction instruction = new Instruction(cursor.getInt(cursor.getColumnIndex("_id")),
+                    cursor.getString(cursor.getColumnIndex("instruction")));
+            instructions.add(instruction);
+        }
+
+        cursor.close();
+        close();
+        return instructions;
+    }
+    
+    public Recipe fetchRecipe(int id)
+    {
+        open();
+        Recipe recipe = null;
+        String sql = "SELECT r." + Recipes.COLUMN_RECIPE_ID + ", r."
+                + Recipes.COLUMN_RECIPE_CATEGORY_ID + ", r." + Recipes.COLUMN_NAME
+                + " AS recipe_name, r." + Recipes.COLUMN_DESCRIPTION + " AS recipe_description, r."
+                + Recipes.COLUMN_SERVING_SIZE + ", r." + Recipes.COLUMN_DURATION + ", r."
+                + Recipes.COLUMN_VIEWS + ", r." + Recipes.COLUMN_RATINGS + ", r."
+                + Recipes.COLUMN_OVERALL_RATING + ", rc." + RecipeCategories.COLUMN_NAME
+                + " AS category_name, rc." + RecipeCategories.COLUMN_DESCRIPTION
+                + " AS recipe_category_description" + ", r." + Recipes.COLUMN_IMAGE_PATH + " FROM "
+                + Recipes.TABLE_NAME + " AS r" + " INNER JOIN " + RecipeCategories.TABLE_NAME
+                + " AS rc" + " ON rc." + RecipeCategories.COLUMN_RECIPE_CATEGORY_ID + " = r."
+                + Recipes.COLUMN_RECIPE_CATEGORY_ID + " WHERE r." + Recipes.COLUMN_RECIPE_ID
+                + " = '" + id + "' ORDER BY r." + Recipes.COLUMN_OVERALL_RATING + " ASC";
+        Cursor cursor = database.rawQuery(sql, null);
+
+        for(cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext())
+        {
+            Category recipeCategory = new Category(cursor.getInt(cursor.getColumnIndex("rc_id")),
+                    cursor.getString(cursor.getColumnIndex("category_name")),
+                    cursor.getString(cursor.getColumnIndex("recipe_category_description")));
+            recipe = new Recipe(cursor.getInt(cursor.getColumnIndex("_id")), recipeCategory,
+                    cursor.getString(cursor.getColumnIndex("recipe_name")), cursor.getString(cursor
+                            .getColumnIndex("recipe_description")), cursor.getString(cursor
+                            .getColumnIndex("img_path")), cursor.getInt(cursor
+                            .getColumnIndex("serving_size")), cursor.getInt(cursor
+                            .getColumnIndex("duration")));
+            recipe.setViews(cursor.getInt(cursor.getColumnIndex("views")));
+            recipe.setRatings(cursor.getInt(cursor.getColumnIndex("ratings")));
+            recipe.setOverallRating(cursor.getDouble(cursor.getColumnIndex("overall_rating")));
+            recipe.setIngredients(fetchRecipeIngredients(cursor.getInt(cursor.getColumnIndex("_id"))));
+            recipe.setInstructions(fetchInstructions(cursor.getInt(cursor.getColumnIndex("_id"))));
+            recipe.setTags(fetchTags(cursor.getInt(cursor.getColumnIndex("_id"))));
+            recipe.setFavorite(checkFavorites(id));
+        }
+        
+        cursor.close();
+        close();
+        return recipe;
+    }
+
+    public ArrayList<Category> fetchRecipeCategories()
+    {
+        open();
+        ArrayList<Category> recipeCategories = new ArrayList<Category>();
+        String sql = "SELECT * FROM " + RecipeCategories.TABLE_NAME;
+        Cursor cursor = database.rawQuery(sql, null);
+
+        for(cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext())
+        {
+            Category recipeCategory = new Category(cursor.getInt(cursor.getColumnIndex("_id")),
+                    cursor.getString(cursor.getColumnIndex("name")), cursor.getString(cursor
+                            .getColumnIndex("description")));
+            recipeCategories.add(recipeCategory);
+        }
+        cursor.close();
+        close();
+        return recipeCategories;
+    }
+    
+    public long fetchIngredientId(String name)
+    {
+    	long id = -1;
+    	open();
+    	String sql = "SELECT " + Recipes.COLUMN_RECIPE_ID + " FROM " + Recipes.TABLE_NAME + " WHERE " + Recipes.COLUMN_NAME + " = '" + name + "'";
+    	Cursor c = database.rawQuery(sql, null);
+    	c.moveToFirst();
+    	
+    	if(! c.isAfterLast())
+    		id = c.getLong(c.getColumnIndex("_id"));
+    	
+    	c.moveToNext();
+    	c.close();
+    	close();
+    	return id;
+    }
+
+    public ArrayList<Recipe> fetchRecipes()
+    {
+        open();
+        ArrayList<Recipe> recipes = new ArrayList<Recipe>();
+        String sql = "SELECT r." + Recipes.COLUMN_RECIPE_ID + ", r."
+                + Recipes.COLUMN_RECIPE_CATEGORY_ID + ", r." + Recipes.COLUMN_NAME
+                + " AS recipe_name, r." + Recipes.COLUMN_DESCRIPTION + " AS recipe_description, r."
+                + Recipes.COLUMN_SERVING_SIZE + ", r." + Recipes.COLUMN_DURATION + ", r."
+                + Recipes.COLUMN_VIEWS + ", r." + Recipes.COLUMN_RATINGS + ", r."
+                + Recipes.COLUMN_OVERALL_RATING + ", rc." + RecipeCategories.COLUMN_NAME
+                + " AS category_name, rc." + RecipeCategories.COLUMN_DESCRIPTION
+                + " AS recipe_category_description" + ", r." + Recipes.COLUMN_IMAGE_PATH + " FROM "
+                + Recipes.TABLE_NAME + " AS r" + " INNER JOIN " + RecipeCategories.TABLE_NAME
+                + " AS rc" + " ON rc." + RecipeCategories.COLUMN_RECIPE_CATEGORY_ID + " = r."
+                + Recipes.COLUMN_RECIPE_CATEGORY_ID + " WHERE r." + Recipes.COLUMN_OVERALL_RATING
+                + " > 0" + " ORDER BY r." + Recipes.COLUMN_OVERALL_RATING + " ASC";
+        Cursor cursor = database.rawQuery(sql, null);
+
+        for(cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext())
+        {
+            Category recipeCategory = new Category(cursor.getInt(cursor.getColumnIndex("rc_id")),
+                    cursor.getString(cursor.getColumnIndex("category_name")),
+                    cursor.getString(cursor.getColumnIndex("recipe_category_description")));
+            Recipe recipe = new Recipe(cursor.getInt(cursor.getColumnIndex("_id")), recipeCategory,
+                    cursor.getString(cursor.getColumnIndex("recipe_name")), cursor.getString(cursor
+                            .getColumnIndex("recipe_description")), cursor.getString(cursor
+                            .getColumnIndex("img_path")), cursor.getInt(cursor
+                            .getColumnIndex("serving_size")), cursor.getInt(cursor
+                            .getColumnIndex("duration")));
+            recipe.setViews(cursor.getInt(cursor.getColumnIndex("views")));
+            recipe.setRatings(cursor.getInt(cursor.getColumnIndex("ratings")));
+            recipe.setOverallRating(cursor.getDouble(cursor.getColumnIndex("overall_rating")));
+            recipe.setIngredients(fetchRecipeIngredients(cursor.getInt(cursor.getColumnIndex("_id"))));
+            recipe.setInstructions(fetchInstructions(cursor.getInt(cursor.getColumnIndex("_id"))));
+            recipe.setTags(fetchTags(cursor.getInt(cursor.getColumnIndex("_id"))));
+            recipes.add(recipe);
+        }
+        cursor.close();
+        close();
+        return recipes;
+    }
+    
+    public ArrayList<Recipe> fetchAllRecipes()
+    {
+        open();
+        ArrayList<Recipe> recipes = new ArrayList<Recipe>();
+        String sql = "SELECT r." + Recipes.COLUMN_RECIPE_ID + ", r."
+                + Recipes.COLUMN_RECIPE_CATEGORY_ID + ", r." + Recipes.COLUMN_NAME
+                + " AS recipe_name, r." + Recipes.COLUMN_DESCRIPTION + " AS recipe_description, r."
+                + Recipes.COLUMN_SERVING_SIZE + ", r." + Recipes.COLUMN_DURATION + ", r."
+                + Recipes.COLUMN_VIEWS + ", r." + Recipes.COLUMN_RATINGS + ", r."
+                + Recipes.COLUMN_OVERALL_RATING + ", rc." + RecipeCategories.COLUMN_NAME
+                + " AS category_name, rc." + RecipeCategories.COLUMN_DESCRIPTION
+                + " AS recipe_category_description" + ", r." + Recipes.COLUMN_IMAGE_PATH + " FROM "
+                + Recipes.TABLE_NAME + " AS r" + " INNER JOIN " + RecipeCategories.TABLE_NAME
+                + " AS rc" + " ON rc." + RecipeCategories.COLUMN_RECIPE_CATEGORY_ID + " = r."
+                + Recipes.COLUMN_RECIPE_CATEGORY_ID;
+        Cursor cursor = database.rawQuery(sql, null);
+
+        for(cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext())
+        {
+            Category recipeCategory = new Category(cursor.getInt(cursor.getColumnIndex("rc_id")),
+                    cursor.getString(cursor.getColumnIndex("category_name")),
+                    cursor.getString(cursor.getColumnIndex("recipe_category_description")));
+            Recipe recipe = new Recipe(cursor.getInt(cursor.getColumnIndex("_id")), recipeCategory,
+                    cursor.getString(cursor.getColumnIndex("recipe_name")), cursor.getString(cursor
+                            .getColumnIndex("recipe_description")), cursor.getString(cursor
+                            .getColumnIndex("img_path")), cursor.getInt(cursor
+                            .getColumnIndex("serving_size")), cursor.getInt(cursor
+                            .getColumnIndex("duration")));
+            recipe.setViews(cursor.getInt(cursor.getColumnIndex("views")));
+            recipe.setRatings(cursor.getInt(cursor.getColumnIndex("ratings")));
+            recipe.setOverallRating(cursor.getDouble(cursor.getColumnIndex("overall_rating")));
+            recipe.setIngredients(fetchRecipeIngredients(cursor.getInt(cursor.getColumnIndex("_id"))));
+            recipe.setInstructions(fetchInstructions(cursor.getInt(cursor.getColumnIndex("_id"))));
+            recipe.setTags(fetchTags(cursor.getInt(cursor.getColumnIndex("_id"))));
+            recipes.add(recipe);
+        }
+        cursor.close();
+        close();
+        return recipes;
+    }
+    
+    public ArrayList<Recipe> fetchRecipes(String category)
+    {
+        open();
+        ArrayList<Recipe> recipes = new ArrayList<Recipe>();
+        String sql = "SELECT r." + Recipes.COLUMN_RECIPE_ID + ", r."
+                + Recipes.COLUMN_RECIPE_CATEGORY_ID + ", r." + Recipes.COLUMN_NAME
+                + " AS recipe_name, r." + Recipes.COLUMN_DESCRIPTION + " AS recipe_description, r."
+                + Recipes.COLUMN_SERVING_SIZE + ", r." + Recipes.COLUMN_DURATION + ", r."
+                + Recipes.COLUMN_VIEWS + ", r." + Recipes.COLUMN_RATINGS + ", r."
+                + Recipes.COLUMN_OVERALL_RATING + ", rc." + RecipeCategories.COLUMN_NAME
+                + " AS category_name, rc." + RecipeCategories.COLUMN_DESCRIPTION
+                + " AS recipe_category_description" + ", r." + Recipes.COLUMN_IMAGE_PATH + " FROM "
+                + Recipes.TABLE_NAME + " AS r" + " INNER JOIN " + RecipeCategories.TABLE_NAME
+                + " AS rc" + " ON rc." + RecipeCategories.COLUMN_RECIPE_CATEGORY_ID + " = r."
+                + Recipes.COLUMN_RECIPE_CATEGORY_ID + " WHERE rc." + RecipeCategories.COLUMN_NAME
+                + " = '" + category + "' ORDER BY r." + Recipes.COLUMN_OVERALL_RATING + " ASC";
+        Cursor cursor = database.rawQuery(sql, null);
+
+        for(cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext())
+        {
+            Category recipeCategory = new Category(cursor.getInt(cursor.getColumnIndex("rc_id")),
+                    cursor.getString(cursor.getColumnIndex("category_name")),
+                    cursor.getString(cursor.getColumnIndex("recipe_category_description")));
+            Recipe recipe = new Recipe(cursor.getInt(cursor.getColumnIndex("_id")), recipeCategory,
+                    cursor.getString(cursor.getColumnIndex("recipe_name")), cursor.getString(cursor
+                            .getColumnIndex("recipe_description")), cursor.getString(cursor
+                            .getColumnIndex("img_path")), cursor.getInt(cursor
+                            .getColumnIndex("serving_size")), cursor.getInt(cursor
+                            .getColumnIndex("duration")));
+            recipe.setViews(cursor.getInt(cursor.getColumnIndex("views")));
+            recipe.setRatings(cursor.getInt(cursor.getColumnIndex("ratings")));
+            recipe.setOverallRating(cursor.getDouble(cursor.getColumnIndex("overall_rating")));
+            recipe.setIngredients(fetchRecipeIngredients(cursor.getInt(cursor.getColumnIndex("_id"))));
+            recipe.setInstructions(fetchInstructions(cursor.getInt(cursor.getColumnIndex("_id"))));
+            recipe.setTags(fetchTags(cursor.getInt(cursor.getColumnIndex("_id"))));
+            recipes.add(recipe);
+        }
+        cursor.close();
+        close();
+        return recipes;
+    }
+
+    public ArrayList<Category> fetchPantryCategories()
+    {
+        open();
+        ArrayList<Category> pantryCategories = new ArrayList<Category>();
+        String sql = "SELECT * FROM " + PantryCategories.TABLE_NAME;
+        Log.i("Pantry Category SQL", sql);
+        Cursor cursor = database.rawQuery(sql, null);
+
+        for(cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext())
+        {
+            Category pantryCategory = new Category(cursor.getInt(cursor.getColumnIndex("_id")),
+                    cursor.getString(cursor.getColumnIndex("name")), cursor.getString(cursor
+                            .getColumnIndex("description")));
+            pantryCategories.add(pantryCategory);
+        }
+        cursor.close();
+        close();
+        return pantryCategories;
+    }
+
+    public ArrayList<RecipeIngredient> fetchPantryIngredients(String category)
+    {
+        open();
+        ArrayList<RecipeIngredient> pantryIngredients = new ArrayList<RecipeIngredient>();
+        String sql = "SELECT * FROM " + PantryCategories.TABLE_NAME + " INNER JOIN "
+                + PantryIngredients.TABLE_NAME + " ON " + PantryCategories.TABLE_NAME + "."
+                + PantryCategories.COLUMN_NAME + "=" + "'" + category + "' AND "
+                + PantryIngredients.TABLE_NAME + "." + PantryIngredients.COLUMN_PANTRY_CATEGORY_ID
+                + "=" + PantryCategories.TABLE_NAME + "."
+                + PantryCategories.COLUMN_PANTRY_CATEGORY_ID;
+        Log.i("Pantry Ingredients SQL", sql);
+        Cursor cursor = database.rawQuery(sql, null);
+
+        for(cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext())
+        {
+            RecipeIngredient pantryIngredient = new RecipeIngredient(cursor.getLong(cursor
+                    .getColumnIndex("pc_id")), cursor.getString(cursor.getColumnIndex("name")));
+            pantryIngredients.add(pantryIngredient);
+        }
+        cursor.close();
+        close();
+        return pantryIngredients;
+    }
+
+    
+
+    public String[] RetrieveRecipeNames(String category, String search, int fave)
+    {
+        open();
+        Cursor category_id = database.rawQuery("SELECT * FROM " + RecipeCategories.TABLE_NAME
+                + " WHERE " + RecipeCategories.COLUMN_NAME + " LIKE " + "'%" + category + "%'",
+                null);
+
+        category_id.moveToFirst();
+
+        ArrayList<String> mArrayList = new ArrayList<String>();
+        Cursor resultset;
+        if(search == null)
+        {
+            if(fave == 0)
+            {
+                resultset = database.rawQuery(
+                        "SELECT * FROM " + Recipes.TABLE_NAME + " WHERE "
+                                + Recipes.COLUMN_RECIPE_CATEGORY_ID + "="
+                                + category_id.getInt(category_id.getColumnIndex("_id")), null);
+            }
+            else
+            {
+                resultset = database.rawQuery(
+                        "SELECT * FROM " + Recipes.TABLE_NAME + " INNER JOIN "
+                                + Favorites.TABLE_NAME + " ON " + Recipes.TABLE_NAME + "."
+                                + Recipes.COLUMN_RECIPE_CATEGORY_ID + "="
+                                + category_id.getInt(category_id.getColumnIndex("_id")) + " AND "
+                                + Recipes.TABLE_NAME + "." + Recipes.COLUMN_RECIPE_ID + "="
+                                + Favorites.TABLE_NAME + "." + Favorites.COLUMN_RECIPE_ID, null);
+            }
+        }
+        else
+        {
+            if(fave == 0)
+            {
+                resultset = database.rawQuery(
+                        "SELECT * FROM " + Recipes.TABLE_NAME + " WHERE "
+                                + Recipes.COLUMN_RECIPE_CATEGORY_ID + "="
+                                + category_id.getInt(category_id.getColumnIndex("_id")) + " AND "
+                                + Recipes.COLUMN_NAME + " LIKE " + "'%" + search + "%'", null);
+            }
+            else
+            {
+                resultset = database.rawQuery(
+                        "SELECT * FROM " + Recipes.TABLE_NAME + " INNER JOIN "
+                                + Favorites.TABLE_NAME + " ON " + Recipes.TABLE_NAME + "."
+                                + Recipes.COLUMN_RECIPE_CATEGORY_ID + "="
+                                + category_id.getInt(category_id.getColumnIndex("_id")) + " AND "
+                                + Recipes.COLUMN_NAME + " LIKE " + "'%" + search + "%'" + " AND "
+                                + Recipes.TABLE_NAME + "." + Recipes.COLUMN_RECIPE_ID + "="
+                                + Favorites.TABLE_NAME + "." + Favorites.COLUMN_RECIPE_ID, null);
+            }
+
+        }
+
+        for(resultset.moveToFirst(); !resultset.isAfterLast(); resultset.moveToNext())
+        {
+            mArrayList.add(resultset.getString(resultset.getColumnIndex("name")));
+        }
+
+        resultset.close();
+        category_id.close();
+        close();
+        return mArrayList.toArray(new String[mArrayList.size()]);
+    }
+
+    public String[] RetrieveRecipeImages(String category, String search, int fave)
+    {
+        open();
+        Cursor category_id = database.rawQuery("SELECT * FROM " + RecipeCategories.TABLE_NAME
+                + " WHERE " + RecipeCategories.COLUMN_NAME + " LIKE " + "'%" + category + "%'",
+                null);
+        category_id.moveToFirst();
+
+        ArrayList<String> mArrayList = new ArrayList<String>();
+        Cursor resultset;
+
+        if(search == null)
+        {
+            if(fave == 0)
+            {
+                resultset = database.rawQuery("SELECT * FROM " + Recipes.TABLE_NAME + " WHERE "
+                        + Recipes.COLUMN_RECIPE_CATEGORY_ID + "=" + category_id.getInt(0), null);
+                Log.i("Query", "SELECT * FROM " + Recipes.TABLE_NAME + " WHERE "
+                        + Recipes.COLUMN_RECIPE_CATEGORY_ID + "=" + category_id.getInt(0));
+            }
+            else
+            {
+                resultset = database.rawQuery("SELECT * FROM " + Recipes.TABLE_NAME
+                        + " INNER JOIN " + Favorites.TABLE_NAME + " ON " + Recipes.TABLE_NAME + "."
+                        + Recipes.COLUMN_RECIPE_CATEGORY_ID + "=" + category_id.getInt(0) + " AND "
+                        + Recipes.TABLE_NAME + "." + Recipes.COLUMN_RECIPE_ID + "="
+                        + Favorites.TABLE_NAME + "." + Favorites.COLUMN_RECIPE_ID, null);
+                Log.i("Query", "SELECT * FROM " + Recipes.TABLE_NAME + " INNER JOIN "
+                        + Favorites.TABLE_NAME + " ON " + Recipes.TABLE_NAME + "."
+                        + Recipes.COLUMN_RECIPE_CATEGORY_ID + "=" + category_id.getInt(0) + " AND "
+                        + Recipes.TABLE_NAME + "." + Recipes.COLUMN_RECIPE_ID + "="
+                        + Favorites.TABLE_NAME + "." + Favorites.COLUMN_RECIPE_ID);
+            }
+        }
+        else
+        {
+            if(fave == 0)
+            {
+                resultset = database.rawQuery("SELECT * FROM " + Recipes.TABLE_NAME + " WHERE "
+                        + Recipes.COLUMN_RECIPE_CATEGORY_ID + "=" + category_id.getInt(0) + " AND "
+                        + Recipes.COLUMN_NAME + " LIKE " + "'%" + search + "%'", null);
+            }
+            else
+            {
+                resultset = database.rawQuery("SELECT * FROM " + Recipes.TABLE_NAME
+                        + " INNER JOIN " + Favorites.TABLE_NAME + " ON " + Recipes.TABLE_NAME + "."
+                        + Recipes.COLUMN_RECIPE_CATEGORY_ID + "=" + category_id.getInt(0) + " AND "
+                        + Recipes.COLUMN_NAME + " LIKE " + "'%" + search + "%'" + " AND "
+                        + Recipes.TABLE_NAME + "." + Recipes.COLUMN_RECIPE_ID + "="
+                        + Favorites.TABLE_NAME + "." + Favorites.COLUMN_RECIPE_ID, null);
+            }
+        }
+
+        for(resultset.moveToFirst(); !resultset.isAfterLast(); resultset.moveToNext())
+        {
+            mArrayList.add(resultset.getString(resultset.getColumnIndex("img_path")));
+
+        }
+        resultset.close();
+        category_id.close();
+        // this.closeDB();
+        close();
+        return mArrayList.toArray(new String[mArrayList.size()]);
+    }
+
+    public ArrayList<RecipeIngredient> fetchRecipeIngredients(int r_id)
+    {
+        open();
+        ArrayList<RecipeIngredient> recipeIngredients = new ArrayList<RecipeIngredient>();
+        String sql = "SELECT * FROM " + RecipeIngredients.TABLE_NAME + " INNER JOIN "
+                + PantryIngredients.TABLE_NAME + " ON " + RecipeIngredients.TABLE_NAME + "."
+                + RecipeIngredients.COLUMN_RECIPE_ID + "=" + r_id + " AND "
+                + PantryIngredients.TABLE_NAME + "."
+                + PantryIngredients.COLUMN_PANTRY_INGREDIENT_ID + "="
+                + RecipeIngredients.TABLE_NAME + "."
+                + RecipeIngredients.COLUMN_PANTRY_INGREDIENT_ID;
+        Log.i("Recipe Ingredients SQL", sql);
+        Cursor cursor = database.rawQuery(sql, null);
+
+        for(cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext())
+        {
+            RecipeIngredient recipeIngredient = new RecipeIngredient(cursor.getLong(cursor
+                    .getColumnIndex("_id")), cursor.getString(cursor.getColumnIndex("name")),
+                    cursor.getDouble(cursor.getColumnIndex("qty")), cursor.getString(cursor
+                            .getColumnIndex("unit")), cursor.getString(cursor
+                            .getColumnIndex("notes")));
+            recipeIngredients.add(recipeIngredient);
+        }
+        cursor.close();
+        close();
+        return recipeIngredients;
+    }
+
+    public Boolean checkFavorites(int id)
+    {
+        open();
+        Boolean ret = false;
+        Cursor mCursor = database.rawQuery("SELECT * FROM " + Favorites.TABLE_NAME + " WHERE "
+                + Favorites.COLUMN_RECIPE_ID + "=" + id, null);
+        mCursor.moveToFirst();
+
+        if(mCursor.getCount() != 0) ret = true;
+        mCursor.close();
+        close();
+        return ret;
+    }
+
+    public void insertFavorites(int id)
+    {
+        open();
+        ContentValues values = new ContentValues();
+        values.put(Favorites.COLUMN_RECIPE_ID, id);
+        database.insert(Favorites.TABLE_NAME, null, values);
+        close();
+    }
+
+    public void removeFavorite(int id)
+    {
+        open();
+        ContentValues values = new ContentValues();
+        values.put(Favorites.COLUMN_RECIPE_ID, id);
+        database.delete(Favorites.TABLE_NAME, Favorites.COLUMN_RECIPE_ID + "=" + id, null);
+        close();
+    }
+
+    public boolean InsertPantryIngredients(String value, String category)
+    {
+        open();
+        Boolean ret = false;
+        Cursor cursor = database.rawQuery("SELECT * FROM " + PantryCategories.TABLE_NAME
+                + " WHERE " + PantryCategories.COLUMN_NAME + "=" + "'" + category + "'", null);
+        cursor.moveToFirst();
+
+        String sql = "SELECT * FROM " + PantryIngredients.TABLE_NAME + " WHERE LOWER("
+                + PantryIngredients.COLUMN_NAME + ")" + "='" + value.toLowerCase() + "'";
+        Cursor check = database.rawQuery(sql, null);
+        if(check.getCount() == 0)
+        {
+            ContentValues values = new ContentValues();
+            values.put(PantryIngredients.COLUMN_NAME, value);
+            values.put(PantryIngredients.COLUMN_PANTRY_CATEGORY_ID, cursor.getInt(0));
+            database.insert(PantryIngredients.TABLE_NAME, null, values);
+            ret = true;
+        }
+        Log.i("insert ingredient SQL", sql);
+        check.close();
+        cursor.close();
+        close();
+        return ret;
+    }
 }

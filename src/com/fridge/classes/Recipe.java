@@ -1,29 +1,60 @@
+
 package com.fridge.classes;
 
 import java.util.ArrayList;
+
 import recommender.Recommendable;
 import recommender.util.OrderedPair;
 
 public class Recipe implements Recommendable
 {
     private long id;
+
     private Category recipeCategory;
+
     private String name;
+
     private String description;
-    private int servingSize;
-    private int duration;
-    private int views;
-    private double rating;
-    private double overallRating;
-    private ArrayList<RecipeIngredient> recipeIngredients;
-    private ArrayList<Instruction> instructions;
-    private ArrayList<Tag> tags;
     
-    public Recipe(long id, Category recipeCategory, String name, String description, int servingSize, int duration)
+    private boolean favorite;
+
+    private String imagePath;
+
+    private int servingSize;
+
+    private int duration;
+
+    private int views;
+
+    private double rating;
+
+    private double overallRating;
+
+    private ArrayList<RecipeIngredient> recipeIngredients;
+
+    private ArrayList<Instruction> instructions;
+
+    private ArrayList<Tag> tags;
+
+    public Recipe()
+    {
+        recipeIngredients = new ArrayList<RecipeIngredient>();
+        instructions = new ArrayList<Instruction>();
+        tags = new ArrayList<Tag>();
+    }
+
+    public Recipe(long id,
+            Category recipeCategory,
+            String name,
+            String description,
+            String imgPath,
+            int servingSize,
+            int duration)
     {
         this.id = id;
         this.recipeCategory = recipeCategory;
         this.name = name;
+        this.imagePath = imgPath;
         this.description = description;
         this.servingSize = servingSize;
         this.duration = duration;
@@ -34,7 +65,7 @@ public class Recipe implements Recommendable
         instructions = new ArrayList<Instruction>();
         tags = new ArrayList<Tag>();
     }
-    
+
     public Recipe(Recipe recipe)
     {
         id = recipe.getId();
@@ -50,17 +81,17 @@ public class Recipe implements Recommendable
         instructions = recipe.getInstructions();
         tags = recipe.getTags();
     }
-    
+
     public void addIngredient(RecipeIngredient recipeIngredient)
     {
         recipeIngredients.add(recipeIngredient);
     }
-    
+
     public void addInstruction(Instruction instruction)
     {
         instructions.add(instruction);
     }
-    
+
     public void addTag(Tag tag)
     {
         tags.add(tag);
@@ -185,12 +216,37 @@ public class Recipe implements Recommendable
     {
         this.tags = tags;
     }
-    
+
     public void incrementViews()
     {
         views += 1;
     }
+
+    public void setImagePath(String imagePath)
+    {
+        this.imagePath = imagePath;
+    }
+
+    public String getImagePath()
+    {
+        return imagePath;
+    }
     
+    public void toggleFavorite()
+    {
+    	favorite =! favorite;
+    }
+    
+    public boolean isFavorite()
+    {
+    	return favorite;
+    }
+    
+    public void setFavorite(boolean state)
+    {
+    	favorite = state;
+    }
+
     @Override
     public String toString()
     {
@@ -214,7 +270,7 @@ public class Recipe implements Recommendable
     @Override
     public int compareTo(Object o)
     {
-        return name.compareTo(((Recipe)o).getName());
+        return name.compareTo(((Recipe) o).getName());
     }
 
     @Override

@@ -1,17 +1,16 @@
 package com.fridge.activity;
 
-import com.fridge.R;
-import com.fridge.database.FridgeDao;
-import com.fridge.util.FridgeListAdapter;
-
+import java.util.ArrayList;
+import java.util.HashSet;
 import android.app.AlertDialog;
 import android.app.ListActivity;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Typeface;
-import android.graphics.Shader.TileMode;
-import android.graphics.drawable.BitmapDrawable;
-import android.os.Build;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -19,142 +18,232 @@ import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.Toast;
 
-public class Pantry extends ListActivity implements OnItemSelectedListener , OnItemClickListener{
-	
-	private String[] categories;
-	private FridgeListAdapter listAdapter;
-	private Typeface typeface;
-	private FridgeDao database;
-	private Spinner spinner;
+import com.fridge.R;
+import com.fridge.classes.Category;
+import com.fridge.classes.Ingredient;
+import com.fridge.classes.RecipeIngredient;
+import com.fridge.database.FridgeDAO;
+import com.fridge.util.ApplicationController;
+import com.fridge.util.FridgePantryListAdapter;
 
-	
+public class Pantry extends ListActivity implements OnItemSelectedListener,
+		OnItemClickListener
+{
+	private FridgePantryListAdapter	listAdapter;
+
+	private Typeface				typeface;
+
+	private FridgeDAO				database;
+
+	private Spinner					spinnerCategories;
+
+	private ProgressDialog			pDialog;
+
+	private ArrayList<RecipeIngredient>	ingredients;
+
+	private ArrayList<Category>		categories;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_pantry);
-		database = new FridgeDao(this);
-
-//        RelativeLayout layout = (RelativeLayout) findViewById(R.id.search_recipe_category);
-//        BitmapDrawable bg = (BitmapDrawable)getResources().getDrawable(R.drawable.main_header_repeat);
-//        bg.setTileModeX(TileMode.REPEAT);
-//        if(Build.VERSION.SDK_INT < Build.VERSION_CODES.ICE_CREAM_SANDWICH)
-//            layout.setBackgroundDrawable(bg);
-        
-//		Intent intent = getIntent();
-//		int position = intent.getIntExtra("position", -1);
-//		String item = (String) intent.getStringExtra("item");
-		
-		spinner = (Spinner)findViewById(R.id.spinner_pantry_categories);
-		String[] pantrycategories = database.RetrievePantryCategories();
-	    ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, R.layout.spinner_text_layout, R.id.spinner_text, pantrycategories);
-	    adapter.setDropDownViewResource(R.layout.spinner_item_layout);
-	    spinner.setAdapter(adapter);
-		
-		spinner.setOnItemSelectedListener(new OnItemSelectedListener() {
-			@Override
-			public void onItemSelected(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
-				setFridgeList(0);	
-			}
-			@Override
-			public void onNothingSelected(AdapterView<?> arg0) {
-				// TODO Auto-generated method stub
-			}
-		});
-		//		//Spinner
-//		Spinner spinner = (Spinner) findViewById(R.id.spinner_pantry_categories);
-//		ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,  R.array.pantry_categories, android.R.layout.simple_spinner_item);
-//		
-//		adapter.setDropDownViewResource(android.R.layout.simple_list_item_1);
-//		spinner.setAdapter(adapter);
-//		spinner.setOnItemSelectedListener(this);
-	    
-		//initialize list
+		database = new FridgeDAO(this);
+		new LoadCategoriesTask().execute();
 	}
-	
-	public void setFridgeList(int pos)
+
+	public void setCategoriesList(ArrayList<Category> pantryCategories)
 	{
-		//List
-		String[] ingredients = database.RetrievePantryIngredients(spinner.getSelectedItem().toString());
+		String[] pc = new String[pantryCategories.size()];
+
+		for (int i = 0; i < pantryCategories.size(); i++)
+			pc[i] = pantryCategories.get(i).getName();
+
+		ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
+				R.layout.spinner_text_layout, R.id.spinner_text, pc);
+		adapter.setDropDownViewResource(R.layout.spinner_item_layout);
+		spinnerCategories = (Spinner) findViewById(R.id.spinner_pantry_categories);
+		spinnerCategories.setAdapter(adapter);
+		spinnerCategories
+				.setOnItemSelectedListener(new OnItemSelectedListener() {
+					@Override
+					public void onItemSelected(AdapterView<?> arg0, View arg1,
+							int arg2, long arg3)
+					{
+						new LoadIngredientsTask().execute();
+					}
+
+					@Override
+					public void onNothingSelected(AdapterView<?> arg0)
+					{
+
+					}
+				});
+
+	}
+
+	public void setIngredientsList(ArrayList<RecipeIngredient> ingredients)
+	{
 		typeface = Typeface.createFromAsset(getAssets(), "fonts/Lobster.ttf");
-		listAdapter = new FridgeListAdapter(this, R.layout.chcklist_layout, ingredients, typeface);
+		listAdapter = new FridgePantryListAdapter(this,
+				R.layout.chcklist_layout, ingredients, typeface);
 		setListAdapter(listAdapter);
 	}
-	
-	@Override
-	protected void onListItemClick(ListView listView, View view, int position, long id)
+
+	class LoadCategoriesTask extends AsyncTask<String, String, String>
 	{
-		String item = (String) getListAdapter().getItem(position);
-		//Toast.makeText(this, item + " selected", Toast.LENGTH_SHORT).show();
-		AlertDialog.Builder alert = new AlertDialog.Builder(this);
-		
-		alert.setTitle("Recipe");
-		alert.setMessage(item);
-		alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int whichButton) {
-			  //do whatever here
-			  }
-		});
 
-		alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-			 public void onClick(DialogInterface dialog, int whichButton) {
-			   // Canceled.
-			 }
-		});
+		@Override
+		protected void onPreExecute()
+		{
+			super.onPreExecute();
+			pDialog = new ProgressDialog(Pantry.this);
+			pDialog.setMessage("Opening cabinets...");
+			pDialog.setIndeterminate(false);
+			pDialog.setCancelable(false);
+			pDialog.show();
+		}
 
-		alert.show();
+		@Override
+		protected String doInBackground(String... args)
+		{
+			try
+			{
+				categories = database.fetchPantryCategories();
+			}
+			catch (Exception e)
+			{
+				e.printStackTrace();
+			}
+			return null;
+		}
+
+		@Override
+		protected void onPostExecute(String result)
+		{
+			pDialog.dismiss();
+			setCategoriesList(categories);
+
+		}
 	}
-	
-	
+
+	class LoadIngredientsTask extends AsyncTask<String, String, String>
+	{
+
+		@Override
+		protected void onPreExecute()
+		{
+			super.onPreExecute();
+			pDialog = new ProgressDialog(Pantry.this);
+			pDialog.setMessage("Counting sheeps...");
+			pDialog.setIndeterminate(false);
+			pDialog.setCancelable(false);
+			pDialog.show();
+		}
+
+		@Override
+		protected String doInBackground(String... args)
+		{
+			try
+			{
+				ingredients = database.fetchPantryIngredients(spinnerCategories
+						.getSelectedItem().toString());
+			}
+			catch (Exception e)
+			{
+				e.printStackTrace();
+				Log.e("Exception:", e.getMessage());
+			}
+			return null;
+		}
+
+		@Override
+		protected void onPostExecute(String result)
+		{
+			pDialog.dismiss();
+			setIngredientsList(ingredients);
+		}
+	}
+
 	public void addIngredient(View view)
 	{
 		AlertDialog.Builder alert = new AlertDialog.Builder(this);
 		alert.setTitle("Add Ingredient");
 
-		// Set an EditText view to get user input 
 		final EditText input = new EditText(this);
 		alert.setView(input);
-		
+
 		alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-		public void onClick(DialogInterface dialog, int whichButton) {
-		  String value = input.getText().toString();
-		  database.InsertPantryIngredients(value, spinner.getSelectedItem().toString());
-		 //database.Update();
-		}
+			public void onClick(DialogInterface dialog, int whichButton)
+			{
+				String value = input.getText().toString();
+				if (value.length() != 0)
+				{
+					if (database.InsertPantryIngredients(value,
+							spinnerCategories.getSelectedItem().toString()))
+					{
+						Toast.makeText(Pantry.this, value + " added.",
+								Toast.LENGTH_SHORT).show();
+						new LoadIngredientsTask().execute();
+					}
+					else
+						Toast.makeText(Pantry.this,
+								value + " is already on the list.",
+								Toast.LENGTH_SHORT).show();
+				}
+				else
+					Toast.makeText(Pantry.this, "Provide input.",
+							Toast.LENGTH_SHORT).show();
+			}
 		});
 
-		alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-		  public void onClick(DialogInterface dialog, int whichButton) {
-		    // Canceled.
-		  }
-		});
+		alert.setNegativeButton("Cancel",
+				new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int whichButton)
+					{
+
+					}
+				});
 
 		alert.show();
 	}
-	
-	public void onItemSelected(AdapterView<?> parent, View view,int pos, long id)
-	{
-        // An item was selected. You can retrieve the selected item using
-        // parent.getItemAtPosition(pos)
-		
-		//	AdapterView adapter = (AdapterView) parent.getItemAtPosition(pos);
-		Toast.makeText(this, id + " selected", Toast.LENGTH_SHORT).show();
-		//setFridgeList(pos);
-    }
-
-    public void onNothingSelected(AdapterView<?> parent)
-    {
-        // Another interface callback
-    }
 
 	@Override
-	public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
-		// TODO Auto-generated method stub
-		
+	protected void onListItemClick(ListView listView, View view, int position,
+			long id)
+	{}
+
+	public void onItemSelected(AdapterView<?> parent, View view, int pos,
+			long id)
+	{}
+
+	public void onNothingSelected(AdapterView<?> parent)
+	{}
+
+	@Override
+	public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3)
+	{}
+
+	public void click(View view)
+	{
+		Toast.makeText(this, "Opening the cabinets...", Toast.LENGTH_SHORT)
+				.show();
+		ArrayList<RecipeIngredient> recommendables = ((ApplicationController) getApplicationContext())
+				.getRecommendables();
+		//Log.i("Recommendables", recommendables.toString());
+
+		if (recommendables.size() > 0)
+		{
+			Intent intent = new Intent(this, Suggestions.class);
+			intent.putExtra("com.fridge.constants.RECOMMENDATION_TYPE", "Not System Recommendation");
+			//intent.putExtra("ingredients", recommendables);
+			startActivity(intent);
+		}
+		else
+			Toast.makeText(this, "You selected nothing... :(",
+					Toast.LENGTH_SHORT).show();
 	}
-	
 }

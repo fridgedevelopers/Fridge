@@ -1,80 +1,68 @@
 package com.fridge.util;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 
 import com.fridge.R;
-import com.fridge.R.drawable;
-import com.fridge.R.id;
-import com.fridge.R.layout;
-import com.fridge.database.FridgeDao;
-
-import android.app.Activity;
+import com.fridge.classes.Recipe;
+import com.fridge.database.FridgeDAO;
 import android.content.Context;
 import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
-import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
 import android.widget.TextView;
 
-public class ImageAdapter extends BaseAdapter {
+public class ImageAdapter extends BaseAdapter
+{
+	private Context				context;
 
-	private Context context;
-	private String category;
-	private FridgeDao database;
-	public String[] recipe_names;
-	public String[] recipe_images_path;
-	public String search;
+	private ArrayList<Recipe>	recipes;
 
-	public ImageAdapter(Context context, String category) {
+	public String				search	= null;
+
+	public int					favorites;		// 1 - IF favorite 0-IF NOT from favorite
+
+	public ImageAdapter(Context context, ArrayList<Recipe> recipes)
+	{
 		this.context = context;
-		this.category = category;
-		this.database = new FridgeDao(this.context);
-		this.recipe_names = database.RetrieveRecipeNames(this.category, search);
-		this.recipe_images_path = database.RetrieveRecipeImages(this.category,
-				search);
+		new FridgeDAO(this.context);
+		this.recipes = recipes;
 	}
 
-	public ImageAdapter(Context context, String category, String search) {
-		this.context = context;
-		this.category = category;
-		this.database = new FridgeDao(this.context);
-		this.search = search;
-		this.recipe_names = database.RetrieveRecipeNames(this.category, search);
-		this.recipe_images_path = database.RetrieveRecipeImages(this.category,
-				search);
-	}
-
-	public View getView(int position, View convertView, ViewGroup parent) {
-		// TODO Auto-generated method stub
+	@Override
+	public View getView(int position, View convertView, ViewGroup parent)
+	{
 		View v;
-		if (convertView == null) {
+
+		if (convertView == null)
+		{
 			LayoutInflater li = (LayoutInflater) context
 					.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 			v = li.inflate(R.layout.grid_item_layout, parent, false);
-		} else {
-			v = convertView;
 		}
-		TextView tv = (TextView) v.findViewById(R.id.grid_item_text);
-		tv.setText(recipe_names[position]);
+		else
+			v = convertView;
 
+		TextView tv = (TextView) v.findViewById(R.id.grid_item_text);
+		tv.setText(recipes.get(position).getName());
 		ImageView imageView = (ImageView) v.findViewById(R.id.grid_item_image);
-		try {
+
+		try
+		{
 			AssetManager mngr = context.getAssets();
-			InputStream is = mngr.open(recipe_images_path[position]);
+			InputStream is = mngr.open(recipes.get(position).getImagePath());
 			Bitmap bit = BitmapFactory.decodeStream(is);
 			imageView.setImageBitmap(bit);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
+		}
+		catch (IOException e)
+		{
 			e.printStackTrace();
 		}
 
@@ -83,20 +71,20 @@ public class ImageAdapter extends BaseAdapter {
 	}
 
 	@Override
-	public int getCount() {
-		return recipe_names.length;
+	public int getCount()
+	{
+		return recipes.size();
 	}
 
 	@Override
-	public Object getItem(int position) {
-		return null;
+	public Object getItem(int position)
+	{
+		return recipes.get(position);
 	}
 
 	@Override
-	public long getItemId(int position) {
-		return 0;
+	public long getItemId(int position)
+	{
+		return recipes.get(position).getId();
 	}
-
-	// references to our images
-
 }
