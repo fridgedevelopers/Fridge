@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" 
+    android:background="@drawable/fridge_list_state_even" >
+    
+	<View 
+	    android:id="@+id/list_shape"
+	    android:layout_width="10dp"
+	    android:layout_height="10dp"
+    	android:background="@drawable/list_shape"
+    	android:layout_marginLeft="5dp"
+    	android:layout_marginTop="23dp"/>
+	
+    <TextView
+        android:id="@+id/label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@+id/label"
+        android:textSize="26sp"
+        android:textColor="@color/lightest_gray"
+        android:shadowColor="@color/black"
+        android:shadowDx="1"
+        android:shadowDy="1"
+        android:shadowRadius="1"
+        android:paddingLeft="10dp"
+        android:paddingTop="10dp"
+        android:layout_toRightOf="@+id/list_shape">
+    </TextView>
+    
+</RelativeLayout>

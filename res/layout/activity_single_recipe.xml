@@ -49,7 +49,7 @@
                         android:ellipsize="end"
                         android:gravity="center_vertical"
                         android:maxLines="2"
-                        android:text="Neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consecte"
+                        android:text=""
                         android:textColor="@color/lightest_gray"
                         android:textSize="20sp" />
 
@@ -83,7 +83,7 @@
                     android:gravity="center_vertical"
                     android:maxHeight="60dp"
                     android:padding="3dp"
-                    android:text="Neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit..."
+                    android:text="sesciption"
                     android:textColor="@color/light_gray" />
 
                 <TextView
@@ -95,33 +95,33 @@
                     android:layout_marginRight="10dp"
                     android:layout_marginTop="3dp"
                     android:gravity="top"
-                    android:text="Prep time is 100min, serves 100"
+                    android:text="prep time"
                     android:textColor="@color/light_gray"
                     android:textSize="12sp" />
 
-                <Button
-                    android:id="@+id/btn_rate"
-                    style="?android:attr/buttonStyleSmall"
+                <RatingBar
+                    android:id="@+id/vince"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentBottom="true"
-                    android:layout_alignParentLeft="true"
-                    android:onClick="showRatingDialog"
-                    android:text="Rate" />
+                    android:layout_height="50dp"
+                    android:layout_alignLeft="@+id/recipe_description"
+                    android:layout_below="@+id/recipe_description"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginTop="3dp"
+                    android:gravity="top"
+                    style="?android:attr/ratingBarStyleSmall" />
             </RelativeLayout>
 
             <LinearLayout
                 android:id="@+id/instructions_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@color/brown"
-                android:layout_marginTop="354dp">
-                
-					 <com.fridge.util.ExpandedListView
-			            android:id="@android:id/list"
-			            android:layout_width="fill_parent"
-			            android:layout_height="wrap_content" />
-					 
+                android:layout_marginTop="354dp"
+                android:background="@color/brown" >
+
+                <com.fridge.util.ExpandedListView
+                    android:id="@android:id/list"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content" />
             </LinearLayout>
         </RelativeLayout>
     </ScrollView>
@@ -129,34 +129,50 @@
     <!-- For the main_header -->
 
     <RelativeLayout
-        android:id="@+id/main_header"
-        android:layout_width="match_parent"
+        android:id="@+id/search_recipe_category"
+        android:layout_width="fill_parent"
         android:layout_height="75dp"
-        android:background="@drawable/main_header"
-        android:padding="5dp" >
+        android:background="@drawable/main_header" >
 
-        <TextView
-            android:id="@+id/page_title"
+        <RelativeLayout
             android:layout_width="wrap_content"
-            android:layout_height="match_parent"
+            android:layout_height="fill_parent"
             android:layout_marginLeft="10dp"
-            android:layout_toRightOf="@+id/recipe_button"
-            android:ellipsize="marquee"
-            android:gravity="fill_vertical"
-            android:text="Recipe Details"
-            android:textColor="@color/lightest_gray"
-            android:textSize="20sp" />
+            android:layout_marginRight="8dp"
+            android:layout_toRightOf="@+id/search_recipeCategory_layout"
+            android:gravity="center_vertical"
+            android:paddingBottom="10dp" >
 
-        <Button
-            android:id="@+id/recipe_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            <TextView
+                android:id="@+id/recipe_category_search"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:ellipsize="marquee"
+                android:gravity="fill_vertical"
+                android:text="Recipe Details"
+                android:textColor="@color/lightest_gray"
+                android:textSize="20sp" />
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/search_recipeCategory_layout"
+            android:layout_width="70dp"
+            android:layout_height="fill_parent"
             android:layout_alignParentLeft="true"
-            android:layout_alignTop="@+id/page_title"
             android:layout_marginLeft="4dp"
-            android:background="@drawable/recipes_state"
-            android:height="50dp"
-            android:width="50dp" />
+            android:background="@drawable/main_header_green"
+            android:gravity="center_horizontal|center_vertical"
+            android:padding="5dp" >
+
+            <Button
+                android:id="@+id/search_recipeCategory"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignTop="@+id/recipe_category_search"
+                android:background="@drawable/recipes_state"
+                android:height="40dp"
+                android:width="40dp" />
+        </RelativeLayout>
     </RelativeLayout>
 
 </RelativeLayout>

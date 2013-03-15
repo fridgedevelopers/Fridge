@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="70dp"
+    android:padding="6dip" >
+
+    <ImageView
+        android:id="@+id/pic"
+        android:layout_width="60dp"
+        android:layout_height="fill_parent"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginRight="6dip"
+        android:src="@drawable/ic_launcher" />
+
+    <TextView
+        android:id="@+id/description"
+        android:layout_width="fill_parent"
+        android:layout_height="30dp"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentBottom="true"
+        android:layout_toRightOf="@+id/pic"
+        android:textColor="@color/white"
+        android:textSize="12sp"
+        android:ellipsize="marquee"
+        android:gravity="center_vertical"
+        android:maxLines="2"
+        android:text=" that shows how to use RelativeLayou that shows how to use RelativeLayout that shows how to use RelativeLayout that shows how to use RelativeLayout that shows how to use RelativeLayoutt" />
+
+    <TextView
+        android:id="@+id/name"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/description"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:textColor="@color/white"
+        android:layout_alignWithParentIfMissing="true"
+        android:layout_toRightOf="@+id/pic"
+        android:ellipsize="marquee"
+        android:gravity="center_vertical"
+        android:maxLines="1"
+        android:textSize="17sp" 
+        android:text="Fried Chicken"/>
+
+</RelativeLayout>

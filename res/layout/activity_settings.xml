@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <PreferenceCategory android:title="@string/update_data" >
+
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="update_data"
+            android:summary="Automatically update database"
+            android:title="@string/update_data" />
+
+        <PreferenceScreen
+            android:key="update_app"
+            android:summary="Update Fridge"
+            android:title="Update Application" >
+
+            <intent
+                android:action="android.intent.action.VIEW"
+                android:data="http://fridge.comxa.com/" />
+        </PreferenceScreen>
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/limit_data" >
+
+        <ListPreference
+            android:dependency="update_data"
+            android:entries="@array/entry_values"
+            android:entryValues="@array/entry_values"
+            android:key="recipes_count"
+            android:summary="50"
+            android:title="@string/limit_data" />
+    </PreferenceCategory>
+
+</PreferenceScreen>

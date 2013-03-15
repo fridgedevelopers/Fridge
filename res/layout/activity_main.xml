@@ -37,7 +37,7 @@
    	        android:textColor="@color/lightest_gray"
    	        android:textSize="8sp"
    	        android:drawableTop="@drawable/pantry_state"
-   	        android:onClick="pantryClick"/>
+   	        android:onClick="click"/>
    	    
    	    <Button 
    	        android:paddingTop="8dp"
@@ -50,7 +50,7 @@
    			android:textSize="8sp"
    			android:textColor="@color/lightest_gray"
    	        android:drawableTop="@drawable/recipes_state"
-   	        android:onClick="recipesClick" />
+   	        android:onClick="click" />
    	    
    	    <Button 
    	        android:paddingTop="8dp"
@@ -63,7 +63,7 @@
    			android:textSize="8sp"
    			android:textColor="@color/lightest_gray"
    			android:drawableTop="@drawable/suggestions_state"
-   	        android:onClick="suggestionsClick"/>
+   	        android:onClick="click"/>
    	    
    	    <Button 
    	        android:paddingTop="8dp"
@@ -76,7 +76,7 @@
    			android:textSize="8sp"
    			android:textColor="@color/lightest_gray"
    			android:drawableTop="@drawable/favorites_state"
-   	        android:onClick="favoritesClick"  />
+   	        android:onClick="click"  />
    	    
    	</LinearLayout> 
 
